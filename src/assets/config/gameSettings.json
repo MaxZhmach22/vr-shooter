@@ -1,0 +1,51 @@
+{
+  "worldPhysicsOpt": {
+    "gravity": {
+      "x": 0,
+      "y": -9.8,
+      "z": 0
+    },
+    "ccdIterations": 1,
+    "timeStep": 0.016,
+    "allowed_linear_error": 0.0001
+  },
+  "capsOpt": {
+    "count": 10
+  },
+  "capsPhysicsOpt": {
+    "angularDamping": 0.1,
+    "linearDamping": 0,
+    "mass": 0.03,
+    "restitution": 0.7,
+    "friction": 0.1,
+    "blowForce": 0.1,
+    "fadeTime": 0.1,
+    "pauseBeforeFade": 0.2,
+    "combineRule": "Average"
+  },
+  "tablePhysicsOpt": {
+    "mass": 13,
+    "restitution": 0.5,
+    "friction": 0.58
+  },
+  "commonDebugOpt": {
+    "cameraDebug": true,
+    "physicsDebug": false,
+    "perfDebug": true,
+    "timeScale": 1
+  },
+  "postProcessingOpt": {
+    "enabled": false,
+    "colorCorrection": {
+      "enabled": true,
+      "powRGB": { "x": 1, "y": 1, "z": 1 },
+      "mulRGB": { "x": 1, "y": 1, "z": 1 },
+      "addRGB": { "x": 0, "y": 0, "z": 0 }
+    },
+    "vignette": {
+      "enabled": true,
+      "darkness": 1.0,
+      "offset": 0.5
+    }
+  }
+}
