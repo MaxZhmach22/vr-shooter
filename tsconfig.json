@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["es6", "dom"],
+    "types": ["reflect-metadata"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
+}
