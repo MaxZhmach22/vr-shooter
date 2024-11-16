@@ -12,6 +12,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/vr-shooter/',
   plugins: [
     wasm(),
     topLevelAwait(),
@@ -23,6 +24,7 @@ export default defineConfig({
     glsl(),
   ],
   build:{
+    outDir: 'dist/vr-shooter',
     rollupOptions:{
       treeshake: false,
     }
