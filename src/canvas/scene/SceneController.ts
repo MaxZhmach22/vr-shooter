@@ -12,7 +12,7 @@ export class SceneController {
     const light = new AmbientLight(0xffffff, 1.5)
     this._threeJsBase.scene.add(light)
 
-    const directionalLight = new DirectionalLight(0xffffff, 25.5)
+    const directionalLight = new DirectionalLight(0xffffff, 15.5)
     directionalLight.castShadow = true
     directionalLight.position.set(0, 10, 0)
     const group = new Group()

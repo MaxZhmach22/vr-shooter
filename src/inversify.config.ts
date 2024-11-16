@@ -28,6 +28,7 @@ import { VrWinPanel } from '@/canvas/vr/VrWinPanel'
 import { CameraController } from '@/canvas/camera/CameraController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { PlayerController } from '@/canvas/player/PlayerController'
+import { RaycastController } from '@/canvas/raycast/RaycastController'
 
 const buildDIContainer = function (renderer: WebGLRenderer): Container {
   const container = new Container()
@@ -120,6 +121,11 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .to(CameraController)
     .inSingletonScope()
 
+  container
+    .bind<RaycastController>(GAMETYPES.RaycastController)
+    .to(RaycastController)
+    .inSingletonScope()
+
   container.bind<InputController>(TYPES.InputController).to(InputController).inSingletonScope()
 
   container.bind<VrWinPanel>(GAMETYPES.VrWinPanel).to(VrWinPanel).inSingletonScope()
@@ -129,6 +135,7 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IUpdate>(TYPES.Update).toService(TYPES.RapierDebugRenderer)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.VrWinPanel)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.PlayerController)
+  container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.RaycastController)
 
   return container
 }

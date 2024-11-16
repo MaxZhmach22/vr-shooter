@@ -8,7 +8,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { findGUIFolder } from '@/core/utils/utils'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { GameStateService } from '@/canvas/state/GameStateService'
-import { Subject } from 'rxjs'
 import type { IWorld } from '@/core/interfaces/IWorld'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
 
@@ -21,8 +20,6 @@ export class CameraController implements IUpdate {
   private _orbitControls: OrbitControls
 
   private cameraFolderController: Controller
-
-  public onCameraChange = new Subject<PerspectiveCamera>()
 
   private readonly _orbitControlCamera = new PerspectiveCamera(
     35,
@@ -78,6 +75,7 @@ export class CameraController implements IUpdate {
     this._orbitControls.enabled = true
     this._orbitControls.enableDamping = true
     this._orbitControls.update()
+    this._orbitControlCamera.layers.enableAll()
     this._orbitControls.target.set(0, 0, 0)
     this._orbitControlCamera.position.set(0, 0.5, 1)
     this._orbitControlCamera.updateProjectionMatrix()
