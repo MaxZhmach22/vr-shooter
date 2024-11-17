@@ -10,4 +10,5 @@ export interface IVRController {
   userData: {
     isSelecting: boolean
   }
+  gamepad: Gamepad | undefined
 }

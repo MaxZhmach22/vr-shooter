@@ -2,7 +2,15 @@ import { inject, injectable } from 'inversify'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { IGameStateService } from '@/canvas/types/interfaces/IGameStateService'
 import type { IUpdate } from '@/core/interfaces/IUpdate'
-import { Matrix4, Mesh, MeshBasicMaterial, PlaneGeometry, Raycaster, type Vector3 } from 'three'
+import {
+  CircleGeometry,
+  Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
+  Raycaster,
+  type Vector3,
+} from 'three'
 import { TYPES } from '@/core/types/types'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import type GUI from 'lil-gui'
@@ -12,6 +20,7 @@ import type { InputController } from '@/canvas/input/InputController'
 import type { IVRInputEvent } from '@/core/interfaces/IVRInputEvent'
 import { ControllerEventType } from '@/core/enums/ControllerEventType'
 import { Subject } from 'rxjs'
+import type { IVRController } from '@/core/interfaces/IVRController'
 
 @injectable()
 export class RaycastController implements IUpdate {
@@ -19,6 +28,7 @@ export class RaycastController implements IUpdate {
 
   private readonly _raycaster: Raycaster
   private readonly _floorPanel: Mesh
+  private readonly _markMesh: Mesh
   private tempMatrix = new Matrix4()
 
   constructor(
@@ -31,16 +41,23 @@ export class RaycastController implements IUpdate {
   ) {
     this._raycaster = this.createRaycaster()
     this._floorPanel = this.createFloorPanel()
+    this._markMesh = this.createMarkMesh()
     this.floorIntersect = this.floorIntersect.bind(this)
 
     this.inputController.$inputEvent.subscribe(this.floorIntersect)
   }
 
-  update() {}
+  update() {
+    if (!this.threeJSBase.renderer.xr.isPresenting) return
+
+    this.moveMark(this.vrBase.controllers.leftController)
+    this.moveMark(this.vrBase.controllers.rightController)
+  }
 
   private floorIntersect(event: IVRInputEvent) {
     if (event.event !== ControllerEventType.SelectEnd) return
 
+    this._markMesh.visible = false
     const controller = event.controller.controller
     this.tempMatrix.identity().extractRotation(controller.matrixWorld)
     this._raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
@@ -78,5 +95,29 @@ export class RaycastController implements IUpdate {
     this.threeJSBase.scene.add(panel)
 
     return panel
+  }
+
+  private createMarkMesh(): Mesh {
+    const geometry = new CircleGeometry(0.25, 32)
+    const material = new MeshBasicMaterial({ color: 0xff00ff })
+    const mesh = new Mesh(geometry, material)
+    mesh.rotation.x = -Math.PI / 2
+    mesh.visible = false
+    this.threeJSBase.scene.add(mesh)
+    return mesh
+  }
+
+  private moveMark(controller: IVRController) {
+    if (controller.userData.isSelecting) {
+      this.tempMatrix.identity().extractRotation(controller.controller.matrixWorld)
+      this._raycaster.ray.origin.setFromMatrixPosition(controller.controller.matrixWorld)
+      this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
+
+      const floorTouched = this._raycaster.intersectObject(this._floorPanel)
+      if (floorTouched.length <= 0) return
+
+      if (!this._markMesh.visible) this._markMesh.visible = true
+      this._markMesh.position.copy(floorTouched[0].point)
+    }
   }
 }

@@ -23,7 +23,12 @@ export class PlayerController extends Group implements IUpdate {
     super()
     this._playerMesh = this.initPlayer()
     this.position.set(0, 0, 0)
-    this._playerMover = new PlayerMover(this._threeJsBase, this._vrBase, this._raycastController)
+    this._playerMover = new PlayerMover(
+      this,
+      this._threeJsBase,
+      this._vrBase,
+      this._raycastController,
+    )
 
     this._threeJsBase.renderer.xr.addEventListener('sessionstart', () => {
       this._playerMesh.visible = false
@@ -33,7 +38,9 @@ export class PlayerController extends Group implements IUpdate {
     })
   }
 
-  public update() {}
+  public update(deltaTime: number) {
+    this._playerMover.update(deltaTime)
+  }
 
   private initPlayer(): Mesh {
     this.add(this._vrBase.camera)

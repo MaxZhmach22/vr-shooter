@@ -51,6 +51,7 @@ export class ControllerBuilder {
       userData: {
         isSelecting: false,
       },
+      gamepad: undefined,
     }
 
     this._leftController.controller.name = 'leftController'
@@ -73,6 +74,7 @@ export class ControllerBuilder {
       userData: {
         isSelecting: false,
       },
+      gamepad: undefined,
     }
     this._rightController.controller.name = 'rightController'
     this._rightController.controller.addEventListener('connected', (event) => {
