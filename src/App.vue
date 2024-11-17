@@ -24,7 +24,6 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 onMounted(() => {
   const startGameApp = async () => {
     if (canvas.value) {
-      console.log('new version!!! 3')
       new GameInitializer(canvas.value)
     }
   }

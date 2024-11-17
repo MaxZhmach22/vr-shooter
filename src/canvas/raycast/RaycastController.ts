@@ -49,7 +49,6 @@ export class RaycastController implements IUpdate {
     const floorTouched = this._raycaster.intersectObject(this._floorPanel)
     if (floorTouched.length <= 0) return
 
-    console.log('floorTouched', floorTouched[0].point)
     this.$floorIntersect.next(floorTouched[0].point)
   }
 
