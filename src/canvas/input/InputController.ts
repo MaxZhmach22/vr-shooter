@@ -39,6 +39,8 @@ export class InputController {
     const rightController = this.vrBase.controllers.rightController
     const leftController = this.vrBase.controllers.leftController
 
+    console.log('Session Started')
+
     rightController.controller.addEventListener('selectstart', this.onRightControllerSelectStart)
     rightController.controller.addEventListener('selectend', this.onRightControllerSelectEnd)
     rightController.controller.addEventListener('squeezeend', this.onRightControllerSqueezeend)
@@ -53,6 +55,8 @@ export class InputController {
   private removeVRControllerEventListeners() {
     const rightController = this.vrBase.controllers.rightController
     const leftController = this.vrBase.controllers.leftController
+
+    console.log('Session Ended')
 
     rightController.controller.removeEventListener('selectstart', this.onRightControllerSelectStart)
     rightController.controller.removeEventListener('selectend', this.onRightControllerSelectEnd)
