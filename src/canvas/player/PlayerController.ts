@@ -38,8 +38,8 @@ export class PlayerController extends Group implements IUpdate {
     })
   }
 
-  public update(deltaTime: number) {
-    this._playerMover.update(deltaTime)
+  public update() {
+    this._playerMover.update()
   }
 
   private initPlayer(): Mesh {
