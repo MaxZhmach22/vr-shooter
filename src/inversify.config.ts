@@ -29,6 +29,8 @@ import { CameraController } from '@/canvas/camera/CameraController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { PlayerController } from '@/canvas/player/PlayerController'
 import { RaycastController } from '@/canvas/raycast/RaycastController'
+import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
+import type { IOrbitControlsOpt } from '@/canvas/types/interfaces/IOrbitControlsOpt'
 
 const buildDIContainer = function (renderer: WebGLRenderer): Container {
   const container = new Container()
@@ -62,6 +64,10 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   }
 
   // Registering the GameSettings
+  const playerOpt: IPlayerOpt = gameSettings.playerOpt
+  container.bind<IPlayerOpt>(GAMETYPES.PlayerOpt).toConstantValue(playerOpt)
+  const orbitControlsOpt: IOrbitControlsOpt = gameSettings.orbitControlsOpt
+  container.bind<IOrbitControlsOpt>(GAMETYPES.OrbitControlsOpt).toConstantValue(orbitControlsOpt)
   const worldPhysicsOpt: IWorldPhysicsOpt = gameSettings.worldPhysicsOpt
   container.bind<IWorldPhysicsOpt>(GAMETYPES.WorldPhysicsOpt).toConstantValue(worldPhysicsOpt)
   const capsOpt: ICapsOpt = gameSettings.capsOpt

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify'
-import { CapsuleGeometry, Group, Mesh, MeshBasicMaterial } from 'three'
+import { CapsuleGeometry, Group, Mesh, MeshBasicMaterial, Vector3 } from 'three'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import { TYPES } from '@/core/types/types'
 import type GUI from 'lil-gui'
@@ -8,6 +8,7 @@ import type { IUpdate } from '@/core/interfaces/IUpdate'
 import { PlayerMover } from '@/canvas/player/PlayerMover'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { RaycastController } from '@/canvas/raycast/RaycastController'
+import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
 
 @injectable()
 export class PlayerController extends Group implements IUpdate {
@@ -19,12 +20,12 @@ export class PlayerController extends Group implements IUpdate {
     @inject(TYPES.VRBase) private readonly _vrBase: IVRBase,
     @inject(TYPES.GUI) private readonly _gui: GUI,
     @inject(GAMETYPES.RaycastController) private readonly _raycastController: RaycastController,
+    @inject(GAMETYPES.PlayerOpt) private readonly _playerOpt: IPlayerOpt,
   ) {
     super()
     this._playerMesh = this.initPlayer()
-    this.position.set(0, 0, 0)
     this._playerMover = new PlayerMover(
-      this,
+      new Vector3().copy(this._playerOpt.startPosition),
       this._threeJsBase,
       this._vrBase,
       this._raycastController,

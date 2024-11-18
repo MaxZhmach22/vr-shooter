@@ -1,4 +1,8 @@
 const GAMETYPES = {
+  //Options
+  PlayerOpt: Symbol.for('PlayerOpt'),
+  OrbitControlsOpt: Symbol.for('OrbitControlsOpt'),
+
   PlayerController: Symbol.for('PlayerController'),
   SceneController: Symbol.for('SceneController'),
   WorldPhysicsOpt: Symbol.for('WorldPhysicsOpt'),

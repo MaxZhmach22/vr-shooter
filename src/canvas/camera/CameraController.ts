@@ -10,6 +10,7 @@ import { GAMETYPES } from '@/canvas/types/types'
 import type { GameStateService } from '@/canvas/state/GameStateService'
 import type { IWorld } from '@/core/interfaces/IWorld'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
+import type { IOrbitControlsOpt } from '@/canvas/types/interfaces/IOrbitControlsOpt'
 
 @injectable()
 export class CameraController implements IUpdate {
@@ -39,6 +40,7 @@ export class CameraController implements IUpdate {
     @inject(GAMETYPES.GameStateService)
     private readonly _gameStateService: GameStateService,
     @inject(TYPES.VRBase) private readonly _vrBase: IVRBase,
+    @inject(GAMETYPES.OrbitControlsOpt) private readonly _orbitControlsOpt: IOrbitControlsOpt,
   ) {
     this.defaultCameraOptions = {
       aspect: this._threeJsBase.camera.aspect,
@@ -70,14 +72,14 @@ export class CameraController implements IUpdate {
   }
 
   private setupOrbitControlsCamera() {
-    this._orbitControls.enableDamping = true
-    this._orbitControls.rotateSpeed = 0.1
-    this._orbitControls.enabled = true
-    this._orbitControls.enableDamping = true
-    this._orbitControls.update()
+    this._orbitControls.enableDamping = this._orbitControlsOpt.enableDamping
+    this._orbitControls.rotateSpeed = this._orbitControlsOpt.rotateSpeed
+    this._orbitControls.enabled = this._orbitControlsOpt.enabled
+    this._orbitControls.enableDamping = this._orbitControlsOpt.enableDamping
     this._orbitControlCamera.layers.enableAll()
-    this._orbitControls.target.set(0, 0, 0)
-    this._orbitControlCamera.position.set(0, 0.5, 1)
+    this._orbitControlCamera.position.copy(this._orbitControlsOpt.startPosition)
+    this._orbitControls.target.copy(this._orbitControlsOpt.target)
+    this._orbitControls.update()
     this._orbitControlCamera.updateProjectionMatrix()
   }
 

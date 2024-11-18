@@ -14,7 +14,7 @@ export class ResourceLoader {
       //console.log((total / 1) * 100);
     }
 
-    //await this.loadModelResources(loader)
+    await this.loadModelResources(loader)
     //await this.loadTextureResources(loader)
   }
 

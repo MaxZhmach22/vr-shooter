@@ -21,15 +21,18 @@ import type { IVRInputEvent } from '@/core/interfaces/IVRInputEvent'
 import { ControllerEventType } from '@/core/enums/ControllerEventType'
 import { Subject } from 'rxjs'
 import type { IVRController } from '@/core/interfaces/IVRController'
+import { SceneController } from '@/canvas/scene/SceneController'
+import { Layers } from '@/canvas/types/enums/layers'
 
 @injectable()
 export class RaycastController implements IUpdate {
   public $floorIntersect = new Subject<Vector3>()
 
   private readonly _raycaster: Raycaster
-  private readonly _floorPanel: Mesh
   private readonly _markMesh: Mesh
   private tempMatrix = new Matrix4()
+
+  private intersectObjects: Mesh[] = []
 
   constructor(
     @inject(GAMETYPES.GameStateService)
@@ -38,11 +41,14 @@ export class RaycastController implements IUpdate {
     @inject(TYPES.GUI) private readonly gui: GUI,
     @inject(TYPES.VRBase) private readonly vrBase: IVRBase,
     @inject(TYPES.InputController) private readonly inputController: InputController,
+    @inject(GAMETYPES.SceneController) private readonly sceneController: SceneController,
   ) {
     this._raycaster = this.createRaycaster()
-    this._floorPanel = this.createFloorPanel()
     this._markMesh = this.createMarkMesh()
     this.floorIntersect = this.floorIntersect.bind(this)
+
+    this.intersectObjects.push(this.sceneController.getFloor())
+    this.intersectObjects.push(this.sceneController.getObstacles())
 
     this.inputController.$inputEvent.subscribe(this.floorIntersect)
   }
@@ -63,9 +69,9 @@ export class RaycastController implements IUpdate {
     this._raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
     this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
 
-    const floorTouched = this._raycaster.intersectObject(this._floorPanel)
+    const floorTouched = this._raycaster.intersectObjects(this.intersectObjects)
     if (floorTouched.length <= 0) return
-
+    if (floorTouched[0].object.id === this.sceneController.getObstacles().id) return
     this.$floorIntersect.next(floorTouched[0].point)
   }
 
@@ -78,7 +84,8 @@ export class RaycastController implements IUpdate {
 
   private createRaycaster(): Raycaster {
     const raycaster = new Raycaster()
-    raycaster.layers.enable(7)
+    raycaster.layers.enable(Layers.Floor)
+    raycaster.layers.enable(Layers.Obstacle)
     return raycaster
   }
 
@@ -113,11 +120,16 @@ export class RaycastController implements IUpdate {
       this._raycaster.ray.origin.setFromMatrixPosition(controller.controller.matrixWorld)
       this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
 
-      const floorTouched = this._raycaster.intersectObject(this._floorPanel)
+      const floorTouched = this._raycaster.intersectObjects(this.intersectObjects)
       if (floorTouched.length <= 0) return
 
+      if (floorTouched[0].object.id === this.sceneController.getObstacles().id) {
+        if (this._markMesh.visible) this._markMesh.visible = false
+        return
+      }
       if (!this._markMesh.visible) this._markMesh.visible = true
       this._markMesh.position.copy(floorTouched[0].point)
+      this._markMesh.position.y += 0.01
     }
   }
 }

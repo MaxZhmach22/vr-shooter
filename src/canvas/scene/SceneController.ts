@@ -1,18 +1,28 @@
 import { inject, injectable } from 'inversify'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import { TYPES } from '@/core/types/types'
-import { AmbientLight, DirectionalLight, DirectionalLightHelper, GridHelper, Group } from 'three'
+import { AmbientLight, DirectionalLight, DirectionalLightHelper, Group } from 'three'
+import { LevelView } from '@/canvas/scene/LevelView'
 
 @injectable()
 export class SceneController {
+  private readonly _levelView: LevelView
+
+  getFloor() {
+    return this._levelView.floor
+  }
+
+  getObstacles() {
+    return this._levelView.obstacles
+  }
+
   constructor(@inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase) {
-    const gridHelper = new GridHelper(100, 100)
-    this._threeJsBase.scene.add(gridHelper)
+    this._threeJsBase.scene.add((this._levelView = new LevelView()))
 
     const light = new AmbientLight(0xffffff, 1.5)
     this._threeJsBase.scene.add(light)
 
-    const directionalLight = new DirectionalLight(0xffffff, 15.5)
+    const directionalLight = new DirectionalLight(0xffffff, 5.5)
     directionalLight.castShadow = true
     directionalLight.position.set(0, 10, 0)
     const group = new Group()

@@ -1,4 +1,14 @@
 {
+  "playerOpt": {
+    "startPosition": { "x": 0, "y": 0, "z": 5 }
+  },
+  "orbitControlsOpt": {
+    "enabled": true,
+    "rotateSpeed": 0.1,
+    "startPosition": { "x": 40, "y": 40, "z": 40 },
+    "target": { "x": 0, "y": 0, "z": 0 },
+    "enableDamping": true
+  },
   "worldPhysicsOpt": {
     "gravity": {
       "x": 0,

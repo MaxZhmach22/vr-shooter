@@ -1,5 +1,5 @@
 import type { RaycastController } from '@/canvas/raycast/RaycastController'
-import { Euler, MathUtils, type Object3D, Quaternion, Vector3 } from 'three'
+import { Euler, MathUtils, Quaternion, Vector3 } from 'three'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import type { IVRController } from '@/core/interfaces/IVRController'
@@ -11,7 +11,7 @@ export class PlayerMover {
   private _isRotating = false
 
   constructor(
-    private readonly _player: Object3D,
+    private readonly _startPosition: Vector3,
     private readonly _threeJsBase: IThreeJsBase,
     private readonly _vr: IVRBase,
     private readonly _rayCastController: RaycastController,
@@ -31,6 +31,11 @@ export class PlayerMover {
   }
 
   private addSubscriptions() {
+    this._threeJsBase.renderer.xr.addEventListener('sessionstart', () => {
+      this._currentPosition.copy(this._startPosition)
+      this.movePlayer(this._startPosition, this._currentQuaternion)
+    })
+
     this._rayCastController.$floorIntersect.subscribe((event) => {
       this._currentPosition.copy(event)
       this.movePlayer(event, this._currentQuaternion)
