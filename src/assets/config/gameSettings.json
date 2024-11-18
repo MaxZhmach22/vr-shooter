@@ -9,6 +9,9 @@
     "target": { "x": 0, "y": 0, "z": 0 },
     "enableDamping": true
   },
+  "gripOpt": {
+    "mainHand": "right"
+  },
   "worldPhysicsOpt": {
     "gravity": {
       "x": 0,

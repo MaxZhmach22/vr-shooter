@@ -1,7 +1,6 @@
 import {
   AdditiveBlending,
   BufferGeometry,
-  Euler,
   Float32BufferAttribute,
   Line,
   LineBasicMaterial,
@@ -11,7 +10,6 @@ import {
   WebGLRenderer,
 } from 'three'
 
-import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory'
 import { CustomEventDispatcher } from '@/canvas/types/events/CustomEventDispatcher'
 import type { IVRController } from '@/core/interfaces/IVRController'
 import { ControllerType } from '@/core/enums/ControllerType'
@@ -29,8 +27,6 @@ export class ControllerBuilder {
     return this._rightController
   }
 
-  private _currentRotation = new Euler()
-
   constructor(
     private readonly gl: WebGLRenderer,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,10 +34,7 @@ export class ControllerBuilder {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private readonly intersection: any,
   ) {
-    const controllerModelFactory = new XRControllerModelFactory()
-
     const controllerGrip1 = gl.xr.getControllerGrip(0)
-    controllerGrip1.add(controllerModelFactory.createControllerModel(controllerGrip1))
 
     this._leftController = {
       controller: gl.xr.getController(1),
@@ -59,12 +52,8 @@ export class ControllerBuilder {
       // @ts-expect-error no type for data
       this._leftController.controller.add(this.buildController(event.data))
     })
-    // this._leftController.dispatcher.addEventListener('joyStickRotation', (event) =>
-    //   this.onJoystickRotation(event.data),
-    // )
 
     const controllerGrip2 = gl.xr.getControllerGrip(1)
-    controllerGrip2.add(controllerModelFactory.createControllerModel(controllerGrip2))
 
     this._rightController = {
       controller: gl.xr.getController(0),
@@ -81,9 +70,6 @@ export class ControllerBuilder {
       // @ts-expect-error no type for data
       this._rightController.controller.add(this.buildController(event.data))
     })
-    // this._rightController.dispatcher.addEventListener('joyStickRotation', (event) =>
-    //   this.onJoystickRotation(event.data),
-    // )
   }
 
   private buildController(data: XRInputSource) {

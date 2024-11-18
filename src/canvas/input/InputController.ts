@@ -82,41 +82,6 @@ export class InputController {
     controller.controller.addEventListener('squeezestart', this.onSqueezeStart)
 
     controller.gamepad = event.data.gamepad!
-
-    // controllerBuilder.current.leftController.controller.addEventListener('connected', (event) => {
-    //   const { axes } = event.data.gamepad;
-    //   leftControllerAxes.current = { name: 'left', gamepad: event.data.gamepad, isRotating: false };
-    //   console.log('leftController connected', axes);
-    // });
-    //
-    // controllerBuilder.current.rightController.controller.addEventListener('connected', (event) => {
-    //   const { axes } = event.data.gamepad;
-    //   rightControllerAxes.current = {
-    //     name: 'right',
-    //     gamepad: event.data.gamepad,
-    //     isRotating: false,
-    //   };
-    //   console.log('rightController connected', axes);
-    // });
-    //
-    // const keyDebug = (event: KeyboardEvent) => {
-    //   if (event.key === 'k') {
-    //     leftControlAxesRotation.current.x = 1;
-    //     controllerBuilder.current.leftController.dispatcher.dispatchEvent({
-    //       type: 'joyStickRotation',
-    //       data: leftControllerAxes.current,
-    //     });
-    //   } else if (event.key === 'l') {
-    //     rightControlAxesRotation.current.x = 1;
-    //     controllerBuilder.current.rightController.dispatcher.dispatchEvent({
-    //       type: 'joyStickRotation',
-    //       data: rightControllerAxes.current,
-    //     });
-    //   }
-    // };
-    //
-    // window.addEventListener('keydown', keyDebug);
-    //
   }
 
   private removeVRControllerEventListeners(controller: IVRController) {

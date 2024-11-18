@@ -31,6 +31,8 @@ import { PlayerController } from '@/canvas/player/PlayerController'
 import { RaycastController } from '@/canvas/raycast/RaycastController'
 import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
 import type { IOrbitControlsOpt } from '@/canvas/types/interfaces/IOrbitControlsOpt'
+import type { IGripOpt } from '@/canvas/types/interfaces/IGripOpt'
+import { GripViewController } from '@/canvas/grip/controller/GripViewController'
 
 const buildDIContainer = function (renderer: WebGLRenderer): Container {
   const container = new Container()
@@ -68,6 +70,8 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IPlayerOpt>(GAMETYPES.PlayerOpt).toConstantValue(playerOpt)
   const orbitControlsOpt: IOrbitControlsOpt = gameSettings.orbitControlsOpt
   container.bind<IOrbitControlsOpt>(GAMETYPES.OrbitControlsOpt).toConstantValue(orbitControlsOpt)
+  const gripOpt: IGripOpt = gameSettings.gripOpt
+  container.bind<IGripOpt>(GAMETYPES.GripOpt).toConstantValue(gripOpt)
   const worldPhysicsOpt: IWorldPhysicsOpt = gameSettings.worldPhysicsOpt
   container.bind<IWorldPhysicsOpt>(GAMETYPES.WorldPhysicsOpt).toConstantValue(worldPhysicsOpt)
   const capsOpt: ICapsOpt = gameSettings.capsOpt
@@ -132,6 +136,11 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .to(RaycastController)
     .inSingletonScope()
 
+  container
+    .bind<GripViewController>(GAMETYPES.GripViewController)
+    .to(GripViewController)
+    .inSingletonScope()
+
   container.bind<InputController>(TYPES.InputController).to(InputController).inSingletonScope()
 
   container.bind<VrWinPanel>(GAMETYPES.VrWinPanel).to(VrWinPanel).inSingletonScope()
@@ -142,6 +151,7 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.VrWinPanel)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.PlayerController)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.RaycastController)
+  container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.GripViewController)
 
   return container
 }
