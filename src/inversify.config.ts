@@ -69,6 +69,7 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IGripOpt>(GAMETYPES.GripOpt).toConstantValue(gripOpt)
 
   // Registering the Guns options
+  // @ts-expect-error - PistolGripOpt log is not defined
   const pistolOpt: IPistolGripOpt = gameSettings.pistolGripOpt
   container.bind<IPistolGripOpt>(GAMETYPES.PistolGripOpt).toConstantValue(pistolOpt)
 
