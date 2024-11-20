@@ -9,11 +9,13 @@ import { PlayerMover } from '@/canvas/player/PlayerMover'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { RaycastController } from '@/canvas/raycast/RaycastController'
 import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
+import type { IControllersInit } from '@/core/interfaces/IControllersInit'
+import type { IVRController } from '@/core/interfaces/IVRController'
 
 @injectable()
-export class PlayerController extends Group implements IUpdate {
+export class PlayerController extends Group implements IUpdate, IControllersInit {
   private readonly _playerMesh: Mesh
-  private readonly _playerMover: PlayerMover
+  private _playerMover: PlayerMover | null = null
 
   constructor(
     @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
@@ -24,12 +26,6 @@ export class PlayerController extends Group implements IUpdate {
   ) {
     super()
     this._playerMesh = this.initPlayer()
-    this._playerMover = new PlayerMover(
-      new Vector3().copy(this._playerOpt.startPosition),
-      this._threeJsBase,
-      this._vrBase,
-      this._raycastController,
-    )
 
     this._threeJsBase.renderer.xr.addEventListener('sessionstart', () => {
       this._playerMesh.visible = false
@@ -40,15 +36,12 @@ export class PlayerController extends Group implements IUpdate {
   }
 
   public update() {
+    if (!this._playerMover) return
     this._playerMover.update()
   }
 
   private initPlayer(): Mesh {
     this.add(this._vrBase.camera)
-    this.add(this._vrBase.controllers.leftController.controller)
-    this.add(this._vrBase.controllers.leftController.controllerGrip)
-    this.add(this._vrBase.controllers.rightController.controller)
-    this.add(this._vrBase.controllers.rightController.controllerGrip)
 
     const capsule = new CapsuleGeometry(0.5, 1.5, 1, 32)
     const meshBasicMaterial = new MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
@@ -57,5 +50,22 @@ export class PlayerController extends Group implements IUpdate {
     this._threeJsBase.scene.add(this)
 
     return playerMesh
+  }
+
+  public initControllers(mainController: IVRController, teleportController: IVRController) {
+    this.add(mainController.controller)
+    this.add(mainController.controllerGrip)
+    this.add(teleportController.controller)
+    this.add(teleportController.controllerGrip)
+
+    this._playerMover = new PlayerMover(
+      new Vector3().copy(this._playerOpt.startPosition),
+      this._threeJsBase,
+      this._vrBase,
+      this._raycastController,
+      teleportController,
+    )
+
+    console.log('Player controllers initialized')
   }
 }

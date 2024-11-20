@@ -8,6 +8,7 @@ import type { CameraController } from '@/canvas/camera/CameraController'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { SceneController } from '@/canvas/scene/SceneController'
 import type { InputController } from '@/canvas/input/InputController'
+import type { ControllerBuilder } from '@/canvas/vr/ControllerBuilder'
 
 export class GameInitializer {
   private resourcesLoader = new ResourceLoader()
@@ -34,5 +35,6 @@ export class GameInitializer {
     diContainer.get<InputController>(TYPES.InputController)
     diContainer.get<CameraController>(GAMETYPES.CameraController)
     diContainer.get<SceneController>(GAMETYPES.SceneController)
+    diContainer.get<ControllerBuilder>(GAMETYPES.ControllerBuilder)
   }
 }

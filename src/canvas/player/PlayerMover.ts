@@ -9,33 +9,33 @@ export class PlayerMover {
   private _currentQuaternion = new Quaternion()
   private _currentPosition = new Vector3()
   private _isRotating = false
+  private _teleportController: IVRController
 
   constructor(
     private readonly _startPosition: Vector3,
     private readonly _threeJsBase: IThreeJsBase,
     private readonly _vr: IVRBase,
     private readonly _rayCastController: RaycastController,
+    teleportController: IVRController,
   ) {
+    this._teleportController = teleportController
     this.addSubscriptions()
     this.rotatePlayer = this.rotatePlayer.bind(this)
+
+    this._currentPosition.copy(this._startPosition)
+    this.movePlayer(this._startPosition, this._currentQuaternion)
   }
 
   // Update loop
   update() {
-    const leftControllerValue = this.checkGamepads(this._vr.controllers.rightController)
-    const rightControllerValue = this.checkGamepads(this._vr.controllers.leftController)
+    const leftControllerValue = this.checkGamepads(this._teleportController)
 
-    if (leftControllerValue === 0 && rightControllerValue === 0) {
+    if (leftControllerValue === 0) {
       this._isRotating = false
     }
   }
 
   private addSubscriptions() {
-    this._threeJsBase.renderer.xr.addEventListener('sessionstart', () => {
-      this._currentPosition.copy(this._startPosition)
-      this.movePlayer(this._startPosition, this._currentQuaternion)
-    })
-
     this._rayCastController.$floorIntersect.subscribe((event) => {
       this._currentPosition.copy(event)
       this.movePlayer(event, this._currentQuaternion)

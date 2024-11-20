@@ -12,6 +12,21 @@
   "gripOpt": {
     "mainHand": "right"
   },
+  "pistolGripOpt": {
+    "visible": true,
+    "baseGripOpt": {
+      "visible": false,
+      "scale": 1,
+      "position": { "x": 0, "y": 0.2, "z": -0.2 },
+      "rotation": { "x": -0.5, "y": 0, "z": 0 }
+    },
+    "pistol": {
+      "scale": 1,
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "rotation": { "x": 2.09, "y": 0, "z": 3.14 }
+    },
+    "rayEnabled": 1
+  },
   "worldPhysicsOpt": {
     "gravity": {
       "x": 0,

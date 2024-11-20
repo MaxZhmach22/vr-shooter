@@ -1,103 +1,80 @@
-import {
-  AdditiveBlending,
-  BufferGeometry,
-  Float32BufferAttribute,
-  Line,
-  LineBasicMaterial,
-  Mesh,
-  MeshBasicMaterial,
-  RingGeometry,
-  WebGLRenderer,
-} from 'three'
-
-import { CustomEventDispatcher } from '@/canvas/types/events/CustomEventDispatcher'
 import type { IVRController } from '@/core/interfaces/IVRController'
 import { ControllerType } from '@/core/enums/ControllerType'
+import { inject, multiInject } from 'inversify'
+import { TYPES } from '@/core/types/types'
+import type { IControllersInit } from '@/core/interfaces/IControllersInit'
+import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
+import type { XRTargetRaySpace } from 'three'
+import { GAMETYPES } from '@/canvas/types/types'
+import type { IGripOpt } from '@/canvas/types/interfaces/grip/IGripOpt'
 
 export class ControllerBuilder {
-  private readonly _leftController: IVRController
-
-  private readonly _rightController: IVRController
-
-  get leftController() {
-    return this._leftController
-  }
-
-  get rightController() {
-    return this._rightController
-  }
+  private _leftController: IVRController | null = null
+  private _rightController: IVRController | null = null
 
   constructor(
-    private readonly gl: WebGLRenderer,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private readonly vr: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private readonly intersection: any,
+    @multiInject(TYPES.ControllersInit) private readonly _notifiers: IControllersInit[],
+    @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
+    @inject(GAMETYPES.GripOpt) private readonly _gripOpt: IGripOpt,
   ) {
-    const controllerGrip1 = gl.xr.getControllerGrip(0)
-
-    this._leftController = {
-      controller: gl.xr.getController(1),
-      controllerGrip: controllerGrip1,
-      dispatcher: new CustomEventDispatcher(),
-      controllerType: ControllerType.Left,
-      userData: {
-        isSelecting: false,
-      },
-      gamepad: undefined,
-    }
-
-    this._leftController.controller.name = 'leftController'
-    this._leftController.controller.addEventListener('connected', (event) => {
-      // @ts-expect-error no type for data
-      this._leftController.controller.add(this.buildController(event.data))
+    const firstIndexController = this._threeJsBase.renderer.xr.getController(0)
+    firstIndexController.addEventListener('connected', (event) => {
+      this.initControllers(event.data, firstIndexController, 0)
     })
 
-    const controllerGrip2 = gl.xr.getControllerGrip(1)
-
-    this._rightController = {
-      controller: gl.xr.getController(0),
-      controllerGrip: controllerGrip2,
-      dispatcher: new CustomEventDispatcher(),
-      controllerType: ControllerType.Right,
-      userData: {
-        isSelecting: false,
-      },
-      gamepad: undefined,
-    }
-    this._rightController.controller.name = 'rightController'
-    this._rightController.controller.addEventListener('connected', (event) => {
-      // @ts-expect-error no type for data
-      this._rightController.controller.add(this.buildController(event.data))
+    const secondIndexController = this._threeJsBase.renderer.xr.getController(1)
+    secondIndexController.addEventListener('connected', (event) => {
+      this.initControllers(event.data, secondIndexController, 1)
     })
   }
 
-  private buildController(data: XRInputSource) {
-    let geometry
-    let material
-
-    switch (data.targetRayMode) {
-      case 'tracked-pointer':
-        geometry = new BufferGeometry()
-        geometry.setAttribute('position', new Float32BufferAttribute([0, 0, 0, 0, 0, -1], 3))
-        geometry.setAttribute('color', new Float32BufferAttribute([0.5, 0.5, 0.5, 0, 0, 0], 3))
-
-        material = new LineBasicMaterial({
-          vertexColors: true,
-          blending: AdditiveBlending,
-        })
-
-        return new Line(geometry, material)
-
-      case 'gaze':
-        geometry = new RingGeometry(0.02, 0.04, 32).translate(0, 0, -1)
-        material = new MeshBasicMaterial({ opacity: 0.5, transparent: true })
-        return new Mesh(geometry, material)
-
+  private initControllers(
+    controller: XRInputSource,
+    xrTargetRaySpace: XRTargetRaySpace,
+    index: number,
+  ) {
+    switch (controller.handedness) {
+      case 'right':
+        this._rightController = {
+          controller: xrTargetRaySpace,
+          controllerGrip: this._threeJsBase.renderer.xr.getControllerGrip(index),
+          controllerType:
+            this._gripOpt.mainHand === 'right' ? ControllerType.MainHand : ControllerType.Teleport,
+          line: null,
+          inputSource: controller,
+          userData: {
+            isSelecting: false,
+          },
+          gamepad: controller.gamepad,
+        }
+        break
+      case 'left':
+        this._leftController = {
+          controller: xrTargetRaySpace,
+          controllerGrip: this._threeJsBase.renderer.xr.getControllerGrip(index),
+          controllerType:
+            this._gripOpt.mainHand === 'left' ? ControllerType.MainHand : ControllerType.Teleport,
+          line: null,
+          inputSource: controller,
+          userData: {
+            isSelecting: false,
+          },
+          gamepad: controller.gamepad,
+        }
+        break
       default:
         break
     }
 
-    return null
+    if (this._leftController && this._rightController) {
+      console.log('Controllers initialized')
+      const mainController =
+        this._gripOpt.mainHand === 'right' ? this._rightController : this._leftController
+      const teleportController =
+        this._gripOpt.mainHand === 'right' ? this._leftController : this._rightController
+      this._notifiers.forEach((notifier) =>
+        notifier.initControllers(mainController, teleportController),
+      )
+    }
   }
 }

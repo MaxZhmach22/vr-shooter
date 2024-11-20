@@ -1,7 +1,7 @@
 import { Container } from 'inversify'
 import { TYPES } from '@/core/types/types'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
-import { PerspectiveCamera, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from 'three'
+import { PerspectiveCamera, Scene, SRGBColorSpace, WebGLRenderer } from 'three'
 import type { IUpdateHandler } from '@/core/interfaces/IUpdateHandler'
 import { UpdateHandler } from '@/core/update/UpdateHandler'
 import type { IUpdate } from '@/core/interfaces/IUpdate'
@@ -31,8 +31,10 @@ import { PlayerController } from '@/canvas/player/PlayerController'
 import { RaycastController } from '@/canvas/raycast/RaycastController'
 import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
 import type { IOrbitControlsOpt } from '@/canvas/types/interfaces/IOrbitControlsOpt'
-import type { IGripOpt } from '@/canvas/types/interfaces/IGripOpt'
+import type { IGripOpt } from '@/canvas/types/interfaces/grip/IGripOpt'
 import { GripViewController } from '@/canvas/grip/controller/GripViewController'
+import type { IPistolGripOpt } from '@/canvas/types/interfaces/grip/IPistolGripOpt'
+import type { IControllersInit } from '@/core/interfaces/IControllersInit'
 
 const buildDIContainer = function (renderer: WebGLRenderer): Container {
   const container = new Container()
@@ -47,22 +49,15 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     scene: new Scene(),
   }
 
-  renderer.xr.enabled = true
   const button = VRButton.createButton(renderer)
   document.body.appendChild(button)
 
   const vr = new VRInitializer(renderer)
-  const vec: Vector3 | undefined = undefined
-  const intersection = {
-    current: vec,
-  }
 
   const vrBase = {
     button: button,
     vr: vr,
-    intersection: intersection,
     camera: new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.01, 200),
-    controllers: new ControllerBuilder(renderer, vr, intersection),
   }
 
   // Registering the GameSettings
@@ -72,6 +67,11 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IOrbitControlsOpt>(GAMETYPES.OrbitControlsOpt).toConstantValue(orbitControlsOpt)
   const gripOpt: IGripOpt = gameSettings.gripOpt
   container.bind<IGripOpt>(GAMETYPES.GripOpt).toConstantValue(gripOpt)
+
+  // Registering the Guns options
+  const pistolOpt: IPistolGripOpt = gameSettings.pistolGripOpt
+  container.bind<IPistolGripOpt>(GAMETYPES.PistolGripOpt).toConstantValue(pistolOpt)
+
   const worldPhysicsOpt: IWorldPhysicsOpt = gameSettings.worldPhysicsOpt
   container.bind<IWorldPhysicsOpt>(GAMETYPES.WorldPhysicsOpt).toConstantValue(worldPhysicsOpt)
   const capsOpt: ICapsOpt = gameSettings.capsOpt
@@ -141,9 +141,20 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .to(GripViewController)
     .inSingletonScope()
 
+  container
+    .bind<ControllerBuilder>(GAMETYPES.ControllerBuilder)
+    .to(ControllerBuilder)
+    .inSingletonScope()
+
   container.bind<InputController>(TYPES.InputController).to(InputController).inSingletonScope()
 
   container.bind<VrWinPanel>(GAMETYPES.VrWinPanel).to(VrWinPanel).inSingletonScope()
+
+  // Registering controllers notifiers
+  container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.GripViewController)
+  container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.PlayerController)
+  container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.RaycastController)
+  container.bind<IControllersInit>(TYPES.ControllersInit).toService(TYPES.InputController)
 
   // Registering classes for UpdatingLoops
   container.bind<IUpdate>(TYPES.Update).toService(TYPES.World)

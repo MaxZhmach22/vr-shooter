@@ -7,6 +7,7 @@ const TYPES = {
   RapierDebugRenderer: Symbol.for('RapierDebugRenderer'),
   GUI: Symbol.for('GUI'),
   InputController: Symbol.for('InputController'),
+  ControllersInit: Symbol.for('ControllersInit'),
 }
 
 export { TYPES }

@@ -3,6 +3,7 @@ const GAMETYPES = {
   PlayerOpt: Symbol.for('PlayerOpt'),
   OrbitControlsOpt: Symbol.for('OrbitControlsOpt'),
   GripOpt: Symbol.for('GripOpt'),
+  PistolGripOpt: Symbol.for('PistolGripOpt'),
 
   PlayerController: Symbol.for('PlayerController'),
   SceneController: Symbol.for('SceneController'),
@@ -17,6 +18,7 @@ const GAMETYPES = {
   CameraController: Symbol.for('CameraController'),
   PostProcessingOpt: Symbol.for('PostProcessingOpt'),
   VrWinPanel: Symbol.for('VrWinPanel'),
+  ControllerBuilder: Symbol.for('ControllerBuilder'),
 }
 
 export { GAMETYPES }

@@ -23,16 +23,20 @@ import { Subject } from 'rxjs'
 import type { IVRController } from '@/core/interfaces/IVRController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { Layers } from '@/canvas/types/enums/layers'
+import type { IControllersInit } from '@/core/interfaces/IControllersInit'
 
 @injectable()
-export class RaycastController implements IUpdate {
+export class RaycastController implements IUpdate, IControllersInit {
   public $floorIntersect = new Subject<Vector3>()
 
   private readonly _raycaster: Raycaster
   private readonly _markMesh: Mesh
+  private controllersInitialized = false
   private tempMatrix = new Matrix4()
 
   private intersectObjects: Mesh[] = []
+
+  private teleportController: IVRController | null = null
 
   constructor(
     @inject(GAMETYPES.GameStateService)
@@ -43,6 +47,7 @@ export class RaycastController implements IUpdate {
     @inject(TYPES.InputController) private readonly inputController: InputController,
     @inject(GAMETYPES.SceneController) private readonly sceneController: SceneController,
   ) {
+    console.log('RaycastController')
     this._raycaster = this.createRaycaster()
     this._markMesh = this.createMarkMesh()
     this.floorIntersect = this.floorIntersect.bind(this)
@@ -53,14 +58,20 @@ export class RaycastController implements IUpdate {
     this.inputController.$inputEvent.subscribe(this.floorIntersect)
   }
 
+  public initControllers(mainController: IVRController, teleportController: IVRController) {
+    this.teleportController = teleportController
+    this.controllersInitialized = true
+  }
+
   update() {
     if (!this.threeJSBase.renderer.xr.isPresenting) return
+    if (!this.controllersInitialized) return
 
-    this.moveMark(this.vrBase.controllers.leftController)
-    this.moveMark(this.vrBase.controllers.rightController)
+    this.moveMark(this.teleportController!)
   }
 
   private floorIntersect(event: IVRInputEvent) {
+    console.log('floorIntersect')
     if (event.event !== ControllerEventType.SelectEnd) return
 
     this._markMesh.visible = false
@@ -116,6 +127,7 @@ export class RaycastController implements IUpdate {
 
   private moveMark(controller: IVRController) {
     if (controller.userData.isSelecting) {
+      console.log('isSelecting')
       this.tempMatrix.identity().extractRotation(controller.controller.matrixWorld)
       this._raycaster.ray.origin.setFromMatrixPosition(controller.controller.matrixWorld)
       this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
