@@ -18,18 +18,23 @@ import { PlayerStateController } from '@/canvas/player/PlayerStateController'
 import { GAMETYPES } from '@/canvas/types/types'
 import { ControllerEventType } from '@/core/enums/ControllerEventType'
 import { Layers } from '@/canvas/types/enums/layers'
+import { Layers as LayersToCheck } from 'three'
 import { TaskManager } from '@/core/managers/task-manager'
 import type { IGripOpt } from '@/canvas/types/interfaces/grip/IGripOpt'
+import type { IWorld } from '@/core/interfaces/IWorld'
 
 @injectable()
 export class ShootRaycastController implements IUpdate {
   private readonly _raycaster: Raycaster
+  private readonly _obstaclesLayer = new LayersToCheck()
+  private readonly _ballLayer = new LayersToCheck()
 
   constructor(
     @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
     @inject(TYPES.InputController) private readonly _inputController: InputController,
     @inject(GAMETYPES.PlayerState) private readonly _playerState: PlayerStateController,
     @inject(GAMETYPES.GripOpt) private readonly _gripOpt: IGripOpt,
+    @inject(TYPES.World) private readonly _world: IWorld,
   ) {
     this._raycaster = this.initRaycaster()
     this.shootRaycast = this.shootRaycast.bind(this)
@@ -45,6 +50,14 @@ export class ShootRaycastController implements IUpdate {
     raycaster.layers.enable(Layers.Walls)
     raycaster.layers.enable(Layers.Floor)
     raycaster.layers.enable(Layers.Obstacle)
+    raycaster.layers.enable(Layers.Ball)
+
+    this._obstaclesLayer.set(Layers.Obstacle)
+    this._obstaclesLayer.enable(Layers.Walls)
+    this._obstaclesLayer.enable(Layers.Floor)
+
+    this._ballLayer.set(Layers.Ball)
+
     return raycaster
   }
 
@@ -62,7 +75,23 @@ export class ShootRaycastController implements IUpdate {
 
     const intersects = this._raycaster.intersectObjects(this._threeJsBase.scene.children, true)
     if (intersects.length <= 0) return
-    this.createDint(intersects[0])
+    if (intersects[0].object.layers.test(this._obstaclesLayer)) {
+      this.createDint(intersects[0])
+      return
+    }
+    if (intersects[0].object.layers.test(this._ballLayer)) {
+      console.log('Ball hit')
+      const id = intersects[0].object.id
+      const ball = this._world.getDynamicObjects(id)
+      if (ball) {
+        ball.rigidBody.applyImpulseAtPoint(
+          direction.clone().normalize().multiplyScalar(10),
+          intersects[0].point,
+          true,
+        )
+      }
+      return
+    }
   }
 
   private async createDint(intersect: Intersection) {

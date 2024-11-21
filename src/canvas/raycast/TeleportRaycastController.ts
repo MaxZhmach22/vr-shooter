@@ -12,6 +12,7 @@ import { Subject } from 'rxjs'
 import type { IVRController } from '@/core/interfaces/IVRController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { Layers } from '@/canvas/types/enums/layers'
+import { Layers as LayersToCheck } from 'three'
 import type { IControllersInit } from '@/core/interfaces/IControllersInit'
 import { ControllerType } from '@/core/enums/ControllerType'
 
@@ -23,8 +24,7 @@ export class TeleportRaycastController implements IUpdate, IControllersInit {
   private readonly _markMesh: Mesh
   private controllersInitialized = false
   private tempMatrix = new Matrix4()
-
-  private intersectObjects: Mesh[] = []
+  private readonly _obstaclesLayer = new LayersToCheck()
 
   private teleportController: IVRController | null = null
 
@@ -37,9 +37,6 @@ export class TeleportRaycastController implements IUpdate, IControllersInit {
     this._raycaster = this.createRaycaster()
     this._markMesh = this.createMarkMesh()
     this.floorIntersect = this.floorIntersect.bind(this)
-
-    this.intersectObjects.push(this.sceneController.getFloor())
-    this.intersectObjects.push(this.sceneController.getObstacles())
 
     this.inputController.$inputEvent.subscribe(this.floorIntersect)
   }
@@ -66,16 +63,21 @@ export class TeleportRaycastController implements IUpdate, IControllersInit {
     this._raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld)
     this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
 
-    const floorTouched = this._raycaster.intersectObjects(this.intersectObjects)
+    const floorTouched = this._raycaster.intersectObject(this.sceneController.levelView, true)
     if (floorTouched.length <= 0) return
-    if (floorTouched[0].object.id === this.sceneController.getObstacles().id) return
+    if (floorTouched[0].object.layers.test(this._obstaclesLayer)) return
     this.$floorIntersect.next(floorTouched[0].point)
   }
 
   private createRaycaster(): Raycaster {
     const raycaster = new Raycaster()
+    raycaster.layers.disableAll()
     raycaster.layers.enable(Layers.Floor)
     raycaster.layers.enable(Layers.Obstacle)
+    raycaster.layers.enable(Layers.Walls)
+    this._obstaclesLayer.disableAll()
+    this._obstaclesLayer.enable(Layers.Obstacle)
+    this._obstaclesLayer.enable(Layers.Walls)
     return raycaster
   }
 
@@ -95,10 +97,10 @@ export class TeleportRaycastController implements IUpdate, IControllersInit {
       this._raycaster.ray.origin.setFromMatrixPosition(controller.controller.matrixWorld)
       this._raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix)
 
-      const floorTouched = this._raycaster.intersectObjects(this.intersectObjects)
+      const floorTouched = this._raycaster.intersectObject(this.sceneController.levelView, true)
       if (floorTouched.length <= 0) return
 
-      if (floorTouched[0].object.id === this.sceneController.getObstacles().id) {
+      if (floorTouched[0].object.layers.test(this._obstaclesLayer)) {
         if (this._markMesh.visible) this._markMesh.visible = false
         return
       }

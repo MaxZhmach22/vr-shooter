@@ -102,3 +102,15 @@ export function mapRange(
 ) {
   return ((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
 }
+
+/**
+ * Convert layers to a mask
+ * @param layers
+ */
+export function layersToMask(layers: number[]): number {
+  let mask = 0
+  layers.forEach((layer: number) => {
+    mask |= 1 << layer
+  })
+  return mask
+}

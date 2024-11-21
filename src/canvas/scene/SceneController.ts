@@ -3,21 +3,21 @@ import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import { TYPES } from '@/core/types/types'
 import { AmbientLight, DirectionalLight, DirectionalLightHelper, Group } from 'three'
 import { LevelView } from '@/canvas/scene/LevelView'
+import type { IWorld } from '@/core/interfaces/IWorld'
 
 @injectable()
 export class SceneController {
   private readonly _levelView: LevelView
 
-  getFloor() {
-    return this._levelView.floor
+  get levelView() {
+    return this._levelView
   }
 
-  getObstacles() {
-    return this._levelView.obstacles
-  }
-
-  constructor(@inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase) {
-    this._threeJsBase.scene.add((this._levelView = new LevelView()))
+  constructor(
+    @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
+    @inject(TYPES.World) private readonly _world: IWorld,
+  ) {
+    this._threeJsBase.scene.add((this._levelView = new LevelView(this._world)))
 
     const light = new AmbientLight(0xffffff, 1.5)
     this._threeJsBase.scene.add(light)
