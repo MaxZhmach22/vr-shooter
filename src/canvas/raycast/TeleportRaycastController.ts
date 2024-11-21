@@ -1,14 +1,7 @@
 import { inject, injectable } from 'inversify'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { IUpdate } from '@/core/interfaces/IUpdate'
-import {
-  CircleGeometry,
-  Matrix4,
-  Mesh,
-  MeshBasicMaterial,
-  Raycaster,
-  type Vector3,
-} from 'three'
+import { CircleGeometry, Matrix4, Mesh, MeshBasicMaterial, Raycaster, type Vector3 } from 'three'
 import { TYPES } from '@/core/types/types'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
 import type GUI from 'lil-gui'
@@ -20,6 +13,7 @@ import type { IVRController } from '@/core/interfaces/IVRController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { Layers } from '@/canvas/types/enums/layers'
 import type { IControllersInit } from '@/core/interfaces/IControllersInit'
+import { ControllerType } from '@/core/enums/ControllerType'
 
 @injectable()
 export class TeleportRaycastController implements IUpdate, IControllersInit {
@@ -63,6 +57,7 @@ export class TeleportRaycastController implements IUpdate, IControllersInit {
   }
 
   private floorIntersect(event: IVRInputEvent) {
+    if (event.controller.controllerType !== ControllerType.Teleport) return
     if (event.event !== ControllerEventType.SelectEnd) return
 
     this._markMesh.visible = false

@@ -7,6 +7,7 @@ import {
   LineBasicMaterial,
   Mesh,
   MeshStandardMaterial,
+  Object3D,
   type PerspectiveCamera,
   type WebGLRenderer,
 } from 'three'
@@ -16,15 +17,20 @@ import type { IVRController } from '@/core/interfaces/IVRController'
 import type { IPistolGripOpt } from '@/canvas/types/interfaces/grip/IPistolGripOpt'
 import GUI from 'lil-gui'
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh'
+import { GripTypes } from '@/canvas/types/enums/grip-types'
+import { Layers } from '@/canvas/types/enums/layers'
 
 export class PistolGripView extends BaseGripView {
   private readonly pistol: Group
   private line: Line | null = null
   protected readonly mesh: HTMLMesh
 
+  gripType = GripTypes.Pistol
+  rayStartPoint: Object3D | null = null
+
   constructor(
     gl: WebGLRenderer,
-    vrCamera: PerspectiveCamera,
+    public vrCamera: PerspectiveCamera,
     controllers: IVRController[],
     private readonly _pistolGripOpt: IPistolGripOpt,
   ) {
@@ -33,6 +39,7 @@ export class PistolGripView extends BaseGripView {
     this.pistol = this.init()
     this.addDebug()
     this.mesh = this.initPanelMesh(this.gui)
+    this.mesh.visible = this._pistolGripOpt.visible
   }
 
   private init(): Group {
@@ -43,7 +50,10 @@ export class PistolGripView extends BaseGripView {
       }
       if (child.name.toLowerCase().includes('start')) {
         child.add((this.line = this.createLine()))
+        this.line.layers.enable(Layers.Helpers)
+        this.line.name = 'PistolRay'
         this.line.visible = this._pistolGripOpt.rayEnabled === 1
+        this.rayStartPoint = child
       }
     })
     pistol.rotation.x = -3.8

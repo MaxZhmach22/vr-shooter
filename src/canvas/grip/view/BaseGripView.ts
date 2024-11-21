@@ -4,13 +4,17 @@ import type { IVRController } from '@/core/interfaces/IVRController'
 import GUI from 'lil-gui'
 import type { IBaseGripOpt } from '@/canvas/types/interfaces/grip/IBaseGripOpt'
 import type { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh'
+import { GripTypes } from '@/canvas/types/enums/grip-types'
 
 export abstract class BaseGripView extends Object3D {
   protected interactiveGroup: InteractiveGroup
   protected gui: GUI
   protected abstract mesh: HTMLMesh
 
-  constructor(
+  abstract gripType: GripTypes
+  abstract rayStartPoint: Object3D | null
+
+  protected constructor(
     private readonly _gl: WebGLRenderer,
     private readonly _vrCamera: PerspectiveCamera,
     private readonly _controllers: IVRController[],

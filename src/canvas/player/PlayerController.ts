@@ -21,7 +21,8 @@ export class PlayerController extends Group implements IUpdate, IControllersInit
     @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
     @inject(TYPES.VRBase) private readonly _vrBase: IVRBase,
     @inject(TYPES.GUI) private readonly _gui: GUI,
-    @inject(GAMETYPES.RaycastController) private readonly _raycastController: TeleportRaycastController,
+    @inject(GAMETYPES.TeleportRaycastController)
+    private readonly _raycastController: TeleportRaycastController,
     @inject(GAMETYPES.PlayerOpt) private readonly _playerOpt: IPlayerOpt,
   ) {
     super()

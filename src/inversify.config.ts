@@ -31,6 +31,11 @@ import type { IGripOpt } from '@/canvas/types/interfaces/grip/IGripOpt'
 import { GripViewController } from '@/canvas/grip/controller/GripViewController'
 import type { IPistolGripOpt } from '@/canvas/types/interfaces/grip/IPistolGripOpt'
 import type { IControllersInit } from '@/core/interfaces/IControllersInit'
+import type { ITeleportGripOpt } from '@/canvas/types/interfaces/grip/ITeleportGripOpt'
+import type { IPlayerStateOpt } from '@/canvas/types/interfaces/IPlayerStateOpt'
+import { PlayerStateController } from '@/canvas/player/PlayerStateController'
+import type { IPlayerState } from '@/canvas/types/interfaces/IPlayerState'
+import { ShootRaycastController } from '@/canvas/raycast/ShootRaycastController'
 
 const buildDIContainer = function (renderer: WebGLRenderer): Container {
   const container = new Container()
@@ -59,6 +64,8 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   // Registering the GameSettings
   const playerOpt: IPlayerOpt = gameSettings.playerOpt
   container.bind<IPlayerOpt>(GAMETYPES.PlayerOpt).toConstantValue(playerOpt)
+  const playerStateOpt: IPlayerStateOpt = gameSettings.playerStateOpt
+  container.bind<IPlayerStateOpt>(GAMETYPES.PlayerStateOpt).toConstantValue(playerStateOpt)
   const orbitControlsOpt: IOrbitControlsOpt = gameSettings.orbitControlsOpt
   container.bind<IOrbitControlsOpt>(GAMETYPES.OrbitControlsOpt).toConstantValue(orbitControlsOpt)
   const gripOpt: IGripOpt = gameSettings.gripOpt
@@ -68,6 +75,10 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   // @ts-expect-error - PistolGripOpt log is not defined
   const pistolOpt: IPistolGripOpt = gameSettings.pistolGripOpt
   container.bind<IPistolGripOpt>(GAMETYPES.PistolGripOpt).toConstantValue(pistolOpt)
+
+  // @ts-expect-error - PistolGripOpt log is not defined
+  const teleportGripOpt: ITeleportGripOpt = gameSettings.teleportGripOpt
+  container.bind<ITeleportGripOpt>(GAMETYPES.TeleportGripOpt).toConstantValue(teleportGripOpt)
 
   const worldPhysicsOpt: IWorldPhysicsOpt = gameSettings.worldPhysicsOpt
   container.bind<IWorldPhysicsOpt>(GAMETYPES.WorldPhysicsOpt).toConstantValue(worldPhysicsOpt)
@@ -80,8 +91,6 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   gui.addFolder('Performance')
   gui.addFolder('Camera')
   gui.addFolder('Physics')
-  gui.addFolder('Raycast')
-  gui.addFolder('PostProcessing')
 
   // Registering the GUI
   container.bind<GUI>(TYPES.GUI).toConstantValue(gui)
@@ -120,8 +129,13 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .inSingletonScope()
 
   container
-    .bind<TeleportRaycastController>(GAMETYPES.RaycastController)
+    .bind<TeleportRaycastController>(GAMETYPES.TeleportRaycastController)
     .to(TeleportRaycastController)
+    .inSingletonScope()
+
+  container
+    .bind<ShootRaycastController>(GAMETYPES.ShootRaycastController)
+    .to(ShootRaycastController)
     .inSingletonScope()
 
   container
@@ -134,6 +148,8 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .to(ControllerBuilder)
     .inSingletonScope()
 
+  container.bind<IPlayerState>(GAMETYPES.PlayerState).to(PlayerStateController).inSingletonScope()
+
   container.bind<InputController>(TYPES.InputController).to(InputController).inSingletonScope()
 
   container.bind<VrWinPanel>(GAMETYPES.VrWinPanel).to(VrWinPanel).inSingletonScope()
@@ -141,7 +157,9 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   // Registering controllers notifiers
   container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.GripViewController)
   container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.PlayerController)
-  container.bind<IControllersInit>(TYPES.ControllersInit).toService(GAMETYPES.RaycastController)
+  container
+    .bind<IControllersInit>(TYPES.ControllersInit)
+    .toService(GAMETYPES.TeleportRaycastController)
   container.bind<IControllersInit>(TYPES.ControllersInit).toService(TYPES.InputController)
 
   // Registering classes for UpdatingLoops
@@ -149,7 +167,8 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
   container.bind<IUpdate>(TYPES.Update).toService(TYPES.RapierDebugRenderer)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.VrWinPanel)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.PlayerController)
-  container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.RaycastController)
+  container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.TeleportRaycastController)
+  container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.ShootRaycastController)
   container.bind<IUpdate>(TYPES.Update).toService(GAMETYPES.GripViewController)
 
   return container

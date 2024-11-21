@@ -1,4 +1,4 @@
 export enum ControllerType {
-  MainHand = 0,
-  Teleport = 1,
+  Teleport = 0,
+  MainHand = 1,
 }

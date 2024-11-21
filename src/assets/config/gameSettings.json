@@ -2,6 +2,12 @@
   "playerOpt": {
     "startPosition": { "x": 0, "y": 0, "z": 5 }
   },
+  "playerStateOpt": {
+    "alive": true,
+    "score": 0,
+    "weapon": 1,
+    "teleport": 0
+  },
   "orbitControlsOpt": {
     "enabled": true,
     "rotateSpeed": 0.1,
@@ -13,7 +19,7 @@
     "mainHand": "right"
   },
   "pistolGripOpt": {
-    "visible": true,
+    "visible": false,
     "baseGripOpt": {
       "visible": false,
       "scale": 1,
@@ -24,6 +30,21 @@
       "scale": 1,
       "position": { "x": 0, "y": 0, "z": 0 },
       "rotation": { "x": 2.09, "y": 0, "z": 3.14 }
+    },
+    "rayEnabled": 1
+  },
+  "teleportGripOpt": {
+    "visible": false,
+    "baseGripOpt": {
+      "visible": false,
+      "scale": 1,
+      "position": { "x": 0, "y": 0.2, "z": -0.2 },
+      "rotation": { "x": -0.5, "y": 0, "z": 0 }
+    },
+    "teleport": {
+      "scale": 1,
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "rotation": { "x": 1.7, "y": -0.28, "z": -3.14 }
     },
     "rayEnabled": 1
   },
