@@ -1,4 +1,4 @@
-import type { RaycastController } from '@/canvas/raycast/RaycastController'
+import type { TeleportRaycastController } from '@/canvas/raycast/TeleportRaycastController'
 import { Euler, MathUtils, Quaternion, Vector3 } from 'three'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
 import type { IThreeJsBase } from '@/core/interfaces/IThreeJsBase'
@@ -15,7 +15,7 @@ export class PlayerMover {
     private readonly _startPosition: Vector3,
     private readonly _threeJsBase: IThreeJsBase,
     private readonly _vr: IVRBase,
-    private readonly _rayCastController: RaycastController,
+    private readonly _rayCastController: TeleportRaycastController,
     teleportController: IVRController,
   ) {
     this._teleportController = teleportController

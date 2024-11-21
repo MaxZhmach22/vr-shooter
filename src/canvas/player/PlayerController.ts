@@ -7,7 +7,7 @@ import type { IVRBase } from '@/core/interfaces/IVRBase'
 import type { IUpdate } from '@/core/interfaces/IUpdate'
 import { PlayerMover } from '@/canvas/player/PlayerMover'
 import { GAMETYPES } from '@/canvas/types/types'
-import type { RaycastController } from '@/canvas/raycast/RaycastController'
+import type { TeleportRaycastController } from '@/canvas/raycast/TeleportRaycastController'
 import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
 import type { IControllersInit } from '@/core/interfaces/IControllersInit'
 import type { IVRController } from '@/core/interfaces/IVRController'
@@ -21,7 +21,7 @@ export class PlayerController extends Group implements IUpdate, IControllersInit
     @inject(TYPES.ThreeJsBase) private readonly _threeJsBase: IThreeJsBase,
     @inject(TYPES.VRBase) private readonly _vrBase: IVRBase,
     @inject(TYPES.GUI) private readonly _gui: GUI,
-    @inject(GAMETYPES.RaycastController) private readonly _raycastController: RaycastController,
+    @inject(GAMETYPES.RaycastController) private readonly _raycastController: TeleportRaycastController,
     @inject(GAMETYPES.PlayerOpt) private readonly _playerOpt: IPlayerOpt,
   ) {
     super()

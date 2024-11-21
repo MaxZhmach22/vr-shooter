@@ -12,23 +12,19 @@ import { RapierDebugRenderer } from '@/canvas/physics/RapierDebugRenderer'
 import GUI from 'lil-gui'
 import { IS_PROD } from '@/main'
 import gameSettings from '@/assets/config/gameSettings.json'
-import type { ICapsPhysicsOpt } from '@/canvas/types/interfaces/ICapsPhysicsOpt'
-import type { ITablePhysicsOpt } from '@/canvas/types/interfaces/ITablePhysicsOpt'
 import type { IWorldPhysicsOpt } from '@/canvas/types/interfaces/IWorldPhysicsOpt'
 import type { IGameStateService } from '@/canvas/types/interfaces/IGameStateService'
 import { GameStateService } from '@/canvas/state/GameStateService'
-import type { ICapsOpt } from '@/canvas/types/interfaces/ICapsOpt'
 import { InputController } from '@/canvas/input/InputController'
 import { VRButton } from 'three/examples/jsm/webxr/VRButton'
 import { ControllerBuilder } from '@/canvas/vr/ControllerBuilder'
 import { VRInitializer } from '@/canvas/vr/VRInitializer'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
-import type { IPostProcessingOpt } from '@/canvas/types/interfaces/IPostProcessingOpt'
 import { VrWinPanel } from '@/canvas/vr/VrWinPanel'
 import { CameraController } from '@/canvas/camera/CameraController'
 import { SceneController } from '@/canvas/scene/SceneController'
 import { PlayerController } from '@/canvas/player/PlayerController'
-import { RaycastController } from '@/canvas/raycast/RaycastController'
+import { TeleportRaycastController } from '@/canvas/raycast/TeleportRaycastController'
 import type { IPlayerOpt } from '@/canvas/types/interfaces/IPlayerOpt'
 import type { IOrbitControlsOpt } from '@/canvas/types/interfaces/IOrbitControlsOpt'
 import type { IGripOpt } from '@/canvas/types/interfaces/grip/IGripOpt'
@@ -75,18 +71,9 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
 
   const worldPhysicsOpt: IWorldPhysicsOpt = gameSettings.worldPhysicsOpt
   container.bind<IWorldPhysicsOpt>(GAMETYPES.WorldPhysicsOpt).toConstantValue(worldPhysicsOpt)
-  const capsOpt: ICapsOpt = gameSettings.capsOpt
-  container.bind<ICapsOpt>(GAMETYPES.CapsOpt).toConstantValue(capsOpt)
-  const capsPhysicsOpt: ICapsPhysicsOpt = gameSettings.capsPhysicsOpt
-  container.bind<ICapsPhysicsOpt>(GAMETYPES.CapsPhysicsOpt).toConstantValue(capsPhysicsOpt)
-  const tablePhysicsOpt: ITablePhysicsOpt = gameSettings.tablePhysicsOpt
-  container.bind<ITablePhysicsOpt>(GAMETYPES.TablePhysicsOpt).toConstantValue(tablePhysicsOpt)
+
   const commonDebugOpt = gameSettings.commonDebugOpt
   container.bind(GAMETYPES.CommonDebugOpt).toConstantValue(commonDebugOpt)
-
-  // @ts-expect-error - PostProcessingOpt is not defined
-  const postProcessingOpt: IPostProcessingOpt = gameSettings.postProcessingOpt
-  container.bind<IPostProcessingOpt>(GAMETYPES.PostProcessingOpt).toConstantValue(postProcessingOpt)
 
   const gui = new GUI({ title: 'Debug', width: 300 })
 
@@ -133,8 +120,8 @@ const buildDIContainer = function (renderer: WebGLRenderer): Container {
     .inSingletonScope()
 
   container
-    .bind<RaycastController>(GAMETYPES.RaycastController)
-    .to(RaycastController)
+    .bind<TeleportRaycastController>(GAMETYPES.RaycastController)
+    .to(TeleportRaycastController)
     .inSingletonScope()
 
   container

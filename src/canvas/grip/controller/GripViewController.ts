@@ -60,8 +60,6 @@ export class GripViewController implements IUpdate, IControllersInit {
     let geometry
     let material
 
-    console.log(data.targetRayMode)
-
     switch (data.targetRayMode) {
       case 'tracked-pointer':
         return this.createLine()

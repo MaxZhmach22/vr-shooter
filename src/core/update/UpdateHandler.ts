@@ -13,7 +13,6 @@ import { TaskManager } from '@/core/managers/task-manager'
 import type { IVRBase } from '@/core/interfaces/IVRBase'
 import { GAMETYPES } from '@/canvas/types/types'
 import type { ICommonDebugOpt } from '@/canvas/types/interfaces/ICommonDebugOpt'
-import type { IPostProcessingOpt } from '@/canvas/types/interfaces/IPostProcessingOpt'
 
 @injectable()
 export class UpdateHandler implements IUpdateHandler {
@@ -35,8 +34,6 @@ export class UpdateHandler implements IUpdateHandler {
     @inject(GAMETYPES.CommonDebugOpt)
     private readonly commonDebugOpt: ICommonDebugOpt,
     @inject(TYPES.VRBase) private readonly vrBase: IVRBase,
-    @inject(GAMETYPES.PostProcessingOpt)
-    private readonly postProcessingOpt: IPostProcessingOpt,
   ) {
     this.handleUpdate = this.handleUpdate.bind(this)
     this.initUpdateLoop()
@@ -128,34 +125,5 @@ export class UpdateHandler implements IUpdateHandler {
 
   private initUpdateLoop() {
     this.threeJSBase.renderer.setAnimationLoop(this.handleUpdate)
-
-    window.addEventListener('blur', () => {
-      if (!this.threeJSBase.renderer.xr.isPresenting) return
-
-      // this.threeJSBase.camera.aspect = window.innerWidth / window.innerHeight
-      // this.threeJSBase.renderer.setSize(window.innerWidth, window.innerHeight)
-      // this.threeJSBase.renderer.setPixelRatio(
-      //   Math.min(window.devicePixelRatio, 2),
-      // )
-      // this.threeJSBase.renderer.render(
-      //   this.threeJSBase.scene,
-      //   this.threeJSBase.camera,
-      // )
-      // this.threeJSBase.renderer.setAnimationLoop(null)
-    })
-
-    window.addEventListener('focus', () => {
-      if (this.threeJSBase.renderer.xr.isPresenting) return
-      // this.threeJSBase.camera.aspect = window.innerWidth / window.innerHeight
-      // this.threeJSBase.renderer.setSize(window.innerWidth, window.innerHeight)
-      // this.threeJSBase.renderer.setPixelRatio(
-      //   Math.min(window.devicePixelRatio, 2),
-      // )
-      // this.threeJSBase.renderer.render(
-      //   this.threeJSBase.scene,
-      //   this.threeJSBase.camera,
-      // )
-      // this.threeJSBase.renderer.setAnimationLoop(this.handleUpdate)
-    })
   }
 }
